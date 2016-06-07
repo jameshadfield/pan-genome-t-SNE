@@ -1,0 +1,36 @@
+{
+  "_comment": "http://browsenpm.org/package.json",
+  "name": "pan-genome-t-SNE",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack-dev-server --config webpack-dev-server.config.js --progress --port 8080 --hot --colors"
+  },
+  "main": "js/bundle.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jameshadfield/pan-genome-t-SNE"
+  },
+  "bugs": {
+    "url": "https://github.com/jameshadfield/pan-genome-t-SNE/issues"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.9.1",
+    "babel-eslint": "^6.0.4",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-runtime": "^6.9.2",
+    "events": "^1.1.0",
+    "lodash": "^4.13.1",
+    "papaparse": "^4.1.2",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.1",
+    "webpack-dev-server": "^1.14.1"
+  },
+  "preferGlobal": false,
+  "private": false,
+  "license": "MIT"
+}
