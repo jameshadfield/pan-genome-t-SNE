@@ -1,7 +1,18 @@
 import '../css/style.css';
 import { filesDropped, loadDefaultData } from './filesDropped';
-import { runTsns } from './dimensionalReduction';
-import { drawScatter, updateScatter } from './graphing';
+import { runTSNEIters, initialiseTSNE } from './dimensionalReduction';
+import { drawScatter, updateScatter, updateScatterData } from './graphing';
+import version from './version';
+
+// VARIABLES / CONSTANTS
+let tsne;
+let repaintNum = 0;
+let totalNumRepaints = 50;
+const numIterationsPerRepaint = 100;
+const baseNumRepaints = 50;
+let d3info;
+let Y;
+let taxaNames;
 
 /* users dropping files -> trigger the appropriate loaders ;) */
 document.addEventListener('dragover', (e) => {e.preventDefault();}, false);
@@ -9,44 +20,58 @@ document.addEventListener('drop', filesDropped, false);
 document.addEventListener('keyup', keyIncoming);
 document.addEventListener('roaryData', (e) => wrapper(e), false);
 document.addEventListener('metadataLoaded', () => {
-  updateScatter(window.taxaNames);
+  updateScatter(taxaNames, Y);
   updateInfo();
 });
 
-const numTSNEIters = 5000;
+// let's go..
 updateInfo();
 window.setTimeout(loadDefaultData, 0);
 
+
+// FUNCTIONS (hoisted)
 function wrapper(e) {
-  const Y = runTsns(e, numTSNEIters);
-  window.taxaNames = e.taxaNames; // EEK!!!
-  drawScatter(e.taxaNames, Y);
+  taxaNames = e.taxaNames;
+  [ tsne, Y ] = initialiseTSNE(e);
+  d3info = drawScatter(e.taxaNames, Y);
   updateInfo();
+  // console.log('off to do more iterations...');
+
+  runMoreIterations();
+}
+
+function runMoreIterations() {
+  repaintNum += 1;
+  // console.log('repaint number:', repaintNum);
+  [ tsne, Y ] = runTSNEIters(tsne, numIterationsPerRepaint);
+  updateScatterData(taxaNames, Y, d3info);
+
+  // document.getElementById('progress').innerHTML = '<p>iteration ' + repaintNum * 100 + ' / ' + totalNumRepaints * 100 + '</p>';
+  updateInfo();
+
+
+  if (repaintNum < totalNumRepaints) {
+    window.requestAnimationFrame(runMoreIterations);
+  }
 }
 
 function updateInfo() {
-  const roaryName = window.roaryFile || 'not loaded';
-  const metadataFileName = window.metadata ? window.metadata.fileName : 'not loaded';
-  const metadataColumnName = window.metadata ? window.metadata.headerNames[window.metadata.colToUse] : 'N/A';
+  // const roaryName = window.roaryFile || 'not loaded';
+  // const metadataFileName = window.metadata ? window.metadata.fileName : 'not loaded';
+  // const metadataColumnName = window.metadata ? window.metadata.headerNames[window.metadata.colToUse] : 'N/A';
 
-  const auth = '<p>pan genome t-SNE // james hadfield // version 0.1</p>';
+  const auth = 'pan genome t-SNE // james hadfield // version ' + version;
+  const roary = window.roaryFile ? window.roaryFile : 'Drag on some ROARY results (gene_presence_absence.csv file)';
+  const meta = window.metadata ? window.metadata.fileName : '[optional] Drag on a CSV file linking taxa with metadata.';
+  const metaColumn = window.metadata ? window.metadata.headerNames[window.metadata.colToUse] + ' (press 1-9 to change)' : 'N/A';
+  const iterCount = repaintNum * numIterationsPerRepaint + ' / ' + totalNumRepaints * numIterationsPerRepaint + ' (press m to run ' + numIterationsPerRepaint * baseNumRepaints + ' more)';
+
   const el = document.getElementById('info');
-
-  if (roaryName === 'not loaded' && metadataFileName === 'not loaded') {
-    el.innerHTML = auth
-      + '<p><strong>how to use:</strong></br>'
-      + 'Drag on some ROARY results (gene_presence_absence.csv file) '
-      + 'and (optionally) a CSV file linking taxa with metadata.</br>'
-      + 'The metadata is used to colour the plots on the scatterplot</br>'
-      + 'Pressing 1-9 cycles through metadata columns</p>'
-      + '<p>Currently ' + numTSNEIters + ' iterations will be run, which may be slow (check the javascript console to see progress)</p>';
-  } else {
-    el.innerHTML = auth
-      + '<p>ROARY data: ' + roaryName + '</br>'
-      + 'metadata: ' + metadataFileName + '</br>'
-      + 'metadata column: ' + metadataColumnName + '</br>'
-      + 'num t-SNE iterations: ' + numTSNEIters + '</p>';
-  }
+  el.innerHTML = '<p>' + auth + '</p>'
+    + '<p>ROARY data: ' + roary + '</br>'
+    + 'metadata: ' + meta + '</br>'
+    + 'metadata column: ' + metaColumn + '</br>'
+    + 'num t-SNE iterations: ' + iterCount + '</p>';
 }
 
 function keyIncoming(event) {
@@ -55,8 +80,11 @@ function keyIncoming(event) {
   if (window.metadata) {
     if (key >= 49 && key <= 57) {
       window.metadata.colToUse = key - 49;
-      updateScatter(window.taxaNames);
+      updateScatter(taxaNames, Y);
       updateInfo();
+    } else if (key === 77) { // m
+      totalNumRepaints += baseNumRepaints;
+      runMoreIterations();
     }
   }
 }

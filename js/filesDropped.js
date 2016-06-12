@@ -3,7 +3,7 @@ import { metaParser } from './metadataParser';
 // import { getDefaultMetadata, getDefaultRoaryData } from './defaultData';
 
 export function loadDefaultData() {
-  console.log('default data not available!');
+  // console.log('default data not available!');
   // dealWithMetadata(getDefaultMetadata(), 'test set');
   // dealWithRoaryData(getDefaultRoaryData(), 'test set');
 }

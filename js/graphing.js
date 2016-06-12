@@ -104,16 +104,30 @@ export function drawScatter(taxaNames, data) {
   //       .attr('font-size', 12)
   //       .attr('fill', '#333')
   //       .text((d, i) => taxaNames[i]);
+
+  return ({ x, y });
 }
 
-export function updateScatter(taxaNames) {
+export function updateScatter(taxaNames, data) {
   // console.log('updateScatter triggered');
+  if (taxaNames && data) {
+    d3.select('#embed')
+      .selectAll('.scatter') // what actually is .scatter????
+      .data(data)
+        // .transition().duration(1000)
+        .style('fill', pointColour.bind(this, taxaNames));
+  }
+}
+
+export function updateScatterData(taxaNames, data, d3info) {
   d3.select('#embed')
     .selectAll('.scatter') // what actually is .scatter????
-      // .data(data)
-      // .enter().append('circle')
-        .style('fill', pointColour.bind(this, taxaNames));
+      .data(data)
+      .transition().duration(100)
+      .attr('cx', function (d) { return d3info.x(d[0]); } )
+      .attr('cy', function (d) { return d3info.y(d[1]); } );
 }
+
 
 function pointColour(taxaNames, d, i) {
   // console.log('pointColour triggered. Col:', window.metadata.colToUse);
