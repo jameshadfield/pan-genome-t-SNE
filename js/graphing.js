@@ -1,6 +1,7 @@
 // import { d3 } from 'd3';
 import d3 from 'd3';
 import 'd3-scale';
+import { getSolution } from './dimensionalReduction';
 import d3Tip from 'd3-tip';
 d3.tip = d3Tip;
 
@@ -108,22 +109,34 @@ export function drawScatter(taxaNames, data) {
   return ({ x, y });
 }
 
-export function updateScatter(taxaNames, data) {
+/* function to change the colour of the data points */
+export function updateScatter(taxaNames) {
   // console.log('updateScatter triggered');
-  if (taxaNames && data) {
+  if (taxaNames && window.roaryFile) {
     d3.select('#embed')
       .selectAll('.scatter') // what actually is .scatter????
-      .data(data)
+      .data(getSolution())
         // .transition().duration(1000)
         .style('fill', pointColour.bind(this, taxaNames));
   }
 }
 
+/* functino to update the position of the data points (because the underlying data has changed) */
 export function updateScatterData(taxaNames, data, d3info) {
+  d3info.x.domain([
+    d3.min(data, function (d) { return d[0]; }),
+    d3.max(data, function (d) { return d[0]; }),
+  ]);
+
+  d3info.y.domain([
+    d3.min(data, function (d) { return d[1]; }),
+    d3.max(data, function (d) { return d[1]; }),
+  ]);
+
   d3.select('#embed')
     .selectAll('.scatter') // what actually is .scatter????
       .data(data)
-      .transition().duration(100)
+      // .transition().duration(100)
       .attr('cx', function (d) { return d3info.x(d[0]); } )
       .attr('cy', function (d) { return d3info.y(d[1]); } );
 }

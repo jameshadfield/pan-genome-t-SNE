@@ -5,13 +5,12 @@ import { drawScatter, updateScatter, updateScatterData } from './graphing';
 import version from './version';
 
 // VARIABLES / CONSTANTS
-let tsne;
 let repaintNum = 0;
 let totalNumRepaints = 50;
 const numIterationsPerRepaint = 100;
-const baseNumRepaints = 50;
+const additionalRepaintNumber = 50;
 let d3info;
-let Y;
+let cost = 'N/A';
 let taxaNames;
 
 /* users dropping files -> trigger the appropriate loaders ;) */
@@ -20,7 +19,7 @@ document.addEventListener('drop', filesDropped, false);
 document.addEventListener('keyup', keyIncoming);
 document.addEventListener('roaryData', (e) => wrapper(e), false);
 document.addEventListener('metadataLoaded', () => {
-  updateScatter(taxaNames, Y);
+  updateScatter(taxaNames);
   updateInfo();
 });
 
@@ -32,7 +31,7 @@ window.setTimeout(loadDefaultData, 0);
 // FUNCTIONS (hoisted)
 function wrapper(e) {
   taxaNames = e.taxaNames;
-  [ tsne, Y ] = initialiseTSNE(e);
+  const Y = initialiseTSNE(e);
   d3info = drawScatter(e.taxaNames, Y);
   updateInfo();
   // console.log('off to do more iterations...');
@@ -43,9 +42,10 @@ function wrapper(e) {
 function runMoreIterations() {
   repaintNum += 1;
   // console.log('repaint number:', repaintNum);
-  [ tsne, Y ] = runTSNEIters(tsne, numIterationsPerRepaint);
+  let Y;
+  [ Y, cost ] = runTSNEIters(numIterationsPerRepaint);
   updateScatterData(taxaNames, Y, d3info);
-
+  // console.log('Y[0] = ', Y[0][0], Y[0][1]);
   // document.getElementById('progress').innerHTML = '<p>iteration ' + repaintNum * 100 + ' / ' + totalNumRepaints * 100 + '</p>';
   updateInfo();
 
@@ -64,7 +64,9 @@ function updateInfo() {
   const roary = window.roaryFile ? window.roaryFile : 'Drag on some ROARY results (gene_presence_absence.csv file)';
   const meta = window.metadata ? window.metadata.fileName : '[optional] Drag on a CSV file linking taxa with metadata.';
   const metaColumn = window.metadata ? window.metadata.headerNames[window.metadata.colToUse] + ' (press 1-9 to change)' : 'N/A';
-  const iterCount = repaintNum * numIterationsPerRepaint + ' / ' + totalNumRepaints * numIterationsPerRepaint + ' (press m to run ' + numIterationsPerRepaint * baseNumRepaints + ' more)';
+  const iterCount = repaintNum * numIterationsPerRepaint + ' / ' + totalNumRepaints * numIterationsPerRepaint
+    + ', cost = ' + cost
+    + ' (press m to run ' + numIterationsPerRepaint * additionalRepaintNumber + ' more)';
 
   const el = document.getElementById('info');
   el.innerHTML = '<p>' + auth + '</p>'
@@ -80,10 +82,10 @@ function keyIncoming(event) {
   if (window.metadata) {
     if (key >= 49 && key <= 57) {
       window.metadata.colToUse = key - 49;
-      updateScatter(taxaNames, Y);
+      updateScatter(taxaNames);
       updateInfo();
     } else if (key === 77) { // m
-      totalNumRepaints += baseNumRepaints;
+      totalNumRepaints += additionalRepaintNumber;
       runMoreIterations();
     }
   }

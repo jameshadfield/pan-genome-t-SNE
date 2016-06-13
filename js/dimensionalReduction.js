@@ -28,11 +28,13 @@
 //   return Y;
 // }
 
+let tsne;
+
 export function initialiseTSNE(e) {
   // console.log(e.taxaNames);
   // console.log(e.blockMatrix);
   const opt = { epsilon: 10 }; // epsilon is learning rate (10 = default)
-  const tsne = new tsnejs.tSNE(opt); // create a tSNE instance
+  tsne = new tsnejs.tSNE(opt); // create a tSNE instance
   tsne.initDataDist(e.blockMatrix);
   // const svg = drawEmbedding(tsne, e.taxaNames); // draw initial embedding
 
@@ -48,19 +50,23 @@ export function initialiseTSNE(e) {
   let Y = tsne.getSolution(); // Y is an array of 2-D points that you can plot
   // console.log(Y);
 
-  Y = scaleDataPoints(Y);
+  // Y = scaleDataPoints(Y);
 
-  return [ tsne, Y ];
+  return Y;
 }
 
-export function runTSNEIters(tsne, numIters = 100) {
+export function runTSNEIters(numIters = 100) {
+  let cost;
   for (let k = 0; k < numIters; k++) {
-    tsne.step(); // every time you call this, solution gets better
+    cost = tsne.step(); // every time you call this, solution gets better
   }
   // console.log(tsne.getSolution(), scaleDataPoints(tsne.getSolution()))
-  return [ tsne, scaleDataPoints(tsne.getSolution()) ];
+  return [ scaleDataPoints(tsne.getSolution()), cost ];
 }
 
+export function getSolution() {
+  return scaleDataPoints(tsne.getSolution());
+}
 
 function scaleDataPoints(Y) {
   // console.log('applying scaling to data points');
