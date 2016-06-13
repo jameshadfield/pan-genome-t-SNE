@@ -9,8 +9,8 @@ export function drawScatter(taxaNames, data) {
   document.getElementById('embed').innerHTML = '';
 
   const margin = { top: 10, right: 10, bottom: 10, left: 10 };
-  const width = 800 - margin.left - margin.right;
-  const height = 400 - margin.top - margin.bottom;
+  const width = window.innerWidth - 50 - margin.left - margin.right;
+  const height = window.innerHeight - 220 - margin.top - margin.bottom;
 
   const x = d3.scale.linear()
     .range([ 0, width ])
