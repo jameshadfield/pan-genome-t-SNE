@@ -49,6 +49,122 @@
 
 /***/ },
 /* 1 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.initialiseTSNE = initialiseTSNE;
+	exports.runTSNEIters = runTSNEIters;
+	exports.getSolution = getSolution;
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	// export function runTsns(e, numSteps) {
+	//   // console.log(e.taxaNames);
+	//   // console.log(e.blockMatrix);
+	//   const opt = { epsilon: 10 }; // epsilon is learning rate (10 = default)
+	//   const tsne = new tsnejs.tSNE(opt); // create a tSNE instance
+	//   tsne.initDataDist(e.blockMatrix);
+	//   // const svg = drawEmbedding(tsne, e.taxaNames); // draw initial embedding
+
+	//   // setInterval(() => {
+	//   //   tsne.step();
+	//   //   updateEmbedding(svg, tsne, e.taxaNames);
+	//   // }, 0);
+
+	//   for (let k = 0; k < numSteps; k++) {
+	//     console.log('tsne step', k, '/', numSteps);
+	//     tsne.step(); // every time you call this, solution gets better
+	//     // modifyBanner('computing t-SNE step', k, 'of', numSteps);
+
+	//     // updateEmbedding(svg, tsne, e.taxaNames);
+	//   }
+
+	//   let Y = tsne.getSolution(); // Y is an array of 2-D points that you can plot
+	//   // console.log(Y);
+
+	//   Y = scaleDataPoints(Y);
+
+	//   return Y;
+	// }
+
+	var tsne = void 0;
+
+	function initialiseTSNE(e) {
+	  // console.log(e.taxaNames);
+	  // console.log(e.blockMatrix);
+	  var opt = { epsilon: 10 }; // epsilon is learning rate (10 = default)
+	  tsne = new tsnejs.tSNE(opt); // create a tSNE instance
+	  tsne.initDataDist(e.blockMatrix);
+	  // const svg = drawEmbedding(tsne, e.taxaNames); // draw initial embedding
+
+	  // setInterval(() => {
+	  //   tsne.step();
+	  //   updateEmbedding(svg, tsne, e.taxaNames);
+	  // }, 0);
+
+	  for (var k = 0; k < 100; k++) {
+	    tsne.step(); // every time you call this, solution gets better
+	  }
+
+	  var Y = tsne.getSolution(); // Y is an array of 2-D points that you can plot
+	  // console.log(Y);
+
+	  // Y = scaleDataPoints(Y);
+
+	  return Y;
+	}
+
+	function runTSNEIters() {
+	  var numIters = arguments.length <= 0 || arguments[0] === undefined ? 100 : arguments[0];
+
+	  var cost = void 0;
+	  for (var k = 0; k < numIters; k++) {
+	    cost = tsne.step(); // every time you call this, solution gets better
+	  }
+	  // console.log(tsne.getSolution(), scaleDataPoints(tsne.getSolution()))
+	  return [scaleDataPoints(tsne.getSolution()), cost];
+	}
+
+	function getSolution() {
+	  return scaleDataPoints(tsne.getSolution());
+	}
+
+	function scaleDataPoints(Y) {
+	  // console.log('applying scaling to data points');
+	  var xMin = Math.min.apply(null, Array.apply(undefined, _toConsumableArray(Array(Y.length))).map(function (x, idx) {
+	    return Y[idx][0];
+	  }));
+	  var yMin = Math.min.apply(null, Array.apply(undefined, _toConsumableArray(Array(Y.length))).map(function (x, idx) {
+	    return Y[idx][1];
+	  }));
+	  // let xMax = Math.max.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][0]));
+	  // let yMax = Math.max.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][1]));
+
+	  // console.log('yMin', yMin, 'yMax', yMax, 'xMin', xMin, 'xMax', xMax);
+
+	  var scalar = Math.min(xMin, yMin);
+
+	  for (var i = 0; i < Y.length; i++) {
+	    Y[i][0] = Y[i][0] / scalar;
+	    Y[i][1] = Y[i][1] / scalar;
+	  }
+
+	  // xMin = Math.min.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][0]));
+	  // yMin = Math.min.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][1]));
+	  // xMax = Math.max.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][0]));
+	  // yMax = Math.max.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][1]));
+
+	  // console.log('yMin', yMin, 'yMax', yMax, 'xMin', xMin, 'xMax', xMax);
+
+	  return Y;
+	}
+
+/***/ },
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://d3js.org/d3-color/ Version 0.5.0. Copyright 2016 Mike Bostock.
@@ -570,7 +686,7 @@
 	}));
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://d3js.org/d3-time/ Version 0.3.1. Copyright 2016 Mike Bostock.
@@ -930,7 +1046,7 @@
 	}));
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -10489,7 +10605,7 @@
 	}();
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -11898,114 +12014,6 @@
 
 
 /***/ },
-/* 5 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.initialiseTSNE = initialiseTSNE;
-	exports.runTSNEIters = runTSNEIters;
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-	// export function runTsns(e, numSteps) {
-	//   // console.log(e.taxaNames);
-	//   // console.log(e.blockMatrix);
-	//   const opt = { epsilon: 10 }; // epsilon is learning rate (10 = default)
-	//   const tsne = new tsnejs.tSNE(opt); // create a tSNE instance
-	//   tsne.initDataDist(e.blockMatrix);
-	//   // const svg = drawEmbedding(tsne, e.taxaNames); // draw initial embedding
-
-	//   // setInterval(() => {
-	//   //   tsne.step();
-	//   //   updateEmbedding(svg, tsne, e.taxaNames);
-	//   // }, 0);
-
-	//   for (let k = 0; k < numSteps; k++) {
-	//     console.log('tsne step', k, '/', numSteps);
-	//     tsne.step(); // every time you call this, solution gets better
-	//     // modifyBanner('computing t-SNE step', k, 'of', numSteps);
-
-	//     // updateEmbedding(svg, tsne, e.taxaNames);
-	//   }
-
-	//   let Y = tsne.getSolution(); // Y is an array of 2-D points that you can plot
-	//   // console.log(Y);
-
-	//   Y = scaleDataPoints(Y);
-
-	//   return Y;
-	// }
-
-	function initialiseTSNE(e) {
-	  // console.log(e.taxaNames);
-	  // console.log(e.blockMatrix);
-	  var opt = { epsilon: 10 }; // epsilon is learning rate (10 = default)
-	  var tsne = new tsnejs.tSNE(opt); // create a tSNE instance
-	  tsne.initDataDist(e.blockMatrix);
-	  // const svg = drawEmbedding(tsne, e.taxaNames); // draw initial embedding
-
-	  // setInterval(() => {
-	  //   tsne.step();
-	  //   updateEmbedding(svg, tsne, e.taxaNames);
-	  // }, 0);
-
-	  for (var k = 0; k < 100; k++) {
-	    tsne.step(); // every time you call this, solution gets better
-	  }
-
-	  var Y = tsne.getSolution(); // Y is an array of 2-D points that you can plot
-	  // console.log(Y);
-
-	  Y = scaleDataPoints(Y);
-
-	  return [tsne, Y];
-	}
-
-	function runTSNEIters(tsne) {
-	  var numIters = arguments.length <= 1 || arguments[1] === undefined ? 100 : arguments[1];
-
-	  for (var k = 0; k < numIters; k++) {
-	    tsne.step(); // every time you call this, solution gets better
-	  }
-	  // console.log(tsne.getSolution(), scaleDataPoints(tsne.getSolution()))
-	  return [tsne, scaleDataPoints(tsne.getSolution())];
-	}
-
-	function scaleDataPoints(Y) {
-	  // console.log('applying scaling to data points');
-	  var xMin = Math.min.apply(null, Array.apply(undefined, _toConsumableArray(Array(Y.length))).map(function (x, idx) {
-	    return Y[idx][0];
-	  }));
-	  var yMin = Math.min.apply(null, Array.apply(undefined, _toConsumableArray(Array(Y.length))).map(function (x, idx) {
-	    return Y[idx][1];
-	  }));
-	  // let xMax = Math.max.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][0]));
-	  // let yMax = Math.max.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][1]));
-
-	  // console.log('yMin', yMin, 'yMax', yMax, 'xMin', xMin, 'xMax', xMax);
-
-	  var scalar = Math.min(xMin, yMin);
-
-	  for (var i = 0; i < Y.length; i++) {
-	    Y[i][0] = Y[i][0] / scalar;
-	    Y[i][1] = Y[i][1] / scalar;
-	  }
-
-	  // xMin = Math.min.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][0]));
-	  // yMin = Math.min.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][1]));
-	  // xMax = Math.max.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][0]));
-	  // yMax = Math.max.apply(null, Array(...Array(Y.length)).map((x, idx) => Y[idx][1]));
-
-	  // console.log('yMin', yMin, 'yMax', yMax, 'xMin', xMin, 'xMax', xMax);
-
-	  return Y;
-	}
-
-/***/ },
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -12120,11 +12128,13 @@
 	exports.updateScatter = updateScatter;
 	exports.updateScatterData = updateScatterData;
 
-	var _d = __webpack_require__(3);
+	var _d = __webpack_require__(4);
 
 	var _d2 = _interopRequireDefault(_d);
 
 	__webpack_require__(17);
+
+	var _dimensionalReduction = __webpack_require__(1);
 
 	var _d3Tip = __webpack_require__(19);
 
@@ -12132,15 +12142,16 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	_d2.default.tip = _d3Tip2.default; // import { d3 } from 'd3';
+	// import { d3 } from 'd3';
 
+	_d2.default.tip = _d3Tip2.default;
 
 	function drawScatter(taxaNames, data) {
 	  document.getElementById('embed').innerHTML = '';
 
 	  var margin = { top: 10, right: 10, bottom: 10, left: 10 };
-	  var width = 800 - margin.left - margin.right;
-	  var height = 400 - margin.top - margin.bottom;
+	  var width = window.innerWidth - 50 - margin.left - margin.right;
+	  var height = window.innerHeight - 220 - margin.top - margin.bottom;
 
 	  var x = _d2.default.scale.linear().range([0, width]).nice();
 
@@ -12217,19 +12228,35 @@
 	  return { x: x, y: y };
 	}
 
-	function updateScatter(taxaNames, data) {
+	/* function to change the colour of the data points */
+	function updateScatter(taxaNames) {
 	  // console.log('updateScatter triggered');
-	  if (taxaNames && data) {
+	  if (taxaNames && window.roaryFile) {
 	    _d2.default.select('#embed').selectAll('.scatter') // what actually is .scatter????
-	    .data(data)
+	    .data((0, _dimensionalReduction.getSolution)())
 	    // .transition().duration(1000)
 	    .style('fill', pointColour.bind(this, taxaNames));
 	  }
 	}
 
+	/* functino to update the position of the data points (because the underlying data has changed) */
 	function updateScatterData(taxaNames, data, d3info) {
+	  d3info.x.domain([_d2.default.min(data, function (d) {
+	    return d[0];
+	  }), _d2.default.max(data, function (d) {
+	    return d[0];
+	  })]);
+
+	  d3info.y.domain([_d2.default.min(data, function (d) {
+	    return d[1];
+	  }), _d2.default.max(data, function (d) {
+	    return d[1];
+	  })]);
+
 	  _d2.default.select('#embed').selectAll('.scatter') // what actually is .scatter????
-	  .data(data).transition().duration(100).attr('cx', function (d) {
+	  .data(data)
+	  // .transition().duration(100)
+	  .attr('cx', function (d) {
 	    return d3info.x(d[0]);
 	  }).attr('cy', function (d) {
 	    return d3info.y(d[1]);
@@ -12290,7 +12317,7 @@
 
 	var _filesDropped = __webpack_require__(6);
 
-	var _dimensionalReduction = __webpack_require__(5);
+	var _dimensionalReduction = __webpack_require__(1);
 
 	var _graphing = __webpack_require__(7);
 
@@ -12301,13 +12328,12 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	// VARIABLES / CONSTANTS
-	var tsne = void 0;
 	var repaintNum = 0;
 	var totalNumRepaints = 50;
 	var numIterationsPerRepaint = 100;
-	var baseNumRepaints = 50;
+	var additionalRepaintNumber = 50;
 	var d3info = void 0;
-	var Y = void 0;
+	var cost = 'N/A';
 	var taxaNames = void 0;
 
 	/* users dropping files -> trigger the appropriate loaders ;) */
@@ -12320,7 +12346,7 @@
 	  return wrapper(e);
 	}, false);
 	document.addEventListener('metadataLoaded', function () {
-	  (0, _graphing.updateScatter)(taxaNames, Y);
+	  (0, _graphing.updateScatter)(taxaNames);
 	  updateInfo();
 	});
 
@@ -12331,14 +12357,7 @@
 	// FUNCTIONS (hoisted)
 	function wrapper(e) {
 	  taxaNames = e.taxaNames;
-
-	  var _initialiseTSNE = (0, _dimensionalReduction.initialiseTSNE)(e);
-
-	  var _initialiseTSNE2 = _slicedToArray(_initialiseTSNE, 2);
-
-	  tsne = _initialiseTSNE2[0];
-	  Y = _initialiseTSNE2[1];
-
+	  var Y = (0, _dimensionalReduction.initialiseTSNE)(e);
 	  d3info = (0, _graphing.drawScatter)(e.taxaNames, Y);
 	  updateInfo();
 	  // console.log('off to do more iterations...');
@@ -12349,16 +12368,17 @@
 	function runMoreIterations() {
 	  repaintNum += 1;
 	  // console.log('repaint number:', repaintNum);
+	  var Y = void 0;
 
-	  var _runTSNEIters = (0, _dimensionalReduction.runTSNEIters)(tsne, numIterationsPerRepaint);
+	  var _runTSNEIters = (0, _dimensionalReduction.runTSNEIters)(numIterationsPerRepaint);
 
 	  var _runTSNEIters2 = _slicedToArray(_runTSNEIters, 2);
 
-	  tsne = _runTSNEIters2[0];
-	  Y = _runTSNEIters2[1];
+	  Y = _runTSNEIters2[0];
+	  cost = _runTSNEIters2[1];
 
 	  (0, _graphing.updateScatterData)(taxaNames, Y, d3info);
-
+	  // console.log('Y[0] = ', Y[0][0], Y[0][1]);
 	  // document.getElementById('progress').innerHTML = '<p>iteration ' + repaintNum * 100 + ' / ' + totalNumRepaints * 100 + '</p>';
 	  updateInfo();
 
@@ -12376,7 +12396,7 @@
 	  var roary = window.roaryFile ? window.roaryFile : 'Drag on some ROARY results (gene_presence_absence.csv file)';
 	  var meta = window.metadata ? window.metadata.fileName : '[optional] Drag on a CSV file linking taxa with metadata.';
 	  var metaColumn = window.metadata ? window.metadata.headerNames[window.metadata.colToUse] + ' (press 1-9 to change)' : 'N/A';
-	  var iterCount = repaintNum * numIterationsPerRepaint + ' / ' + totalNumRepaints * numIterationsPerRepaint + ' (press m to run ' + numIterationsPerRepaint * baseNumRepaints + ' more)';
+	  var iterCount = repaintNum * numIterationsPerRepaint + ' / ' + totalNumRepaints * numIterationsPerRepaint + ', cost = ' + cost + ' (press m to run ' + numIterationsPerRepaint * additionalRepaintNumber + ' more)';
 
 	  var el = document.getElementById('info');
 	  el.innerHTML = '<p>' + auth + '</p>' + '<p>ROARY data: ' + roary + '</br>' + 'metadata: ' + meta + '</br>' + 'metadata column: ' + metaColumn + '</br>' + 'num t-SNE iterations: ' + iterCount + '</p>';
@@ -12388,11 +12408,11 @@
 	  if (window.metadata) {
 	    if (key >= 49 && key <= 57) {
 	      window.metadata.colToUse = key - 49;
-	      (0, _graphing.updateScatter)(taxaNames, Y);
+	      (0, _graphing.updateScatter)(taxaNames);
 	      updateInfo();
 	    } else if (key === 77) {
 	      // m
-	      totalNumRepaints += baseNumRepaints;
+	      totalNumRepaints += additionalRepaintNumber;
 	      runMoreIterations();
 	    }
 	  }
@@ -12413,7 +12433,7 @@
 	exports.metaParser = metaParser;
 	exports.getColourScale = getColourScale;
 
-	var _papaparse = __webpack_require__(4);
+	var _papaparse = __webpack_require__(5);
 
 	var _papaparse2 = _interopRequireDefault(_papaparse);
 
@@ -12878,7 +12898,7 @@
 	});
 	exports.roaryParser = roaryParser;
 
-	var _papaparse = __webpack_require__(4);
+	var _papaparse = __webpack_require__(5);
 
 	var _papaparse2 = _interopRequireDefault(_papaparse);
 
@@ -12916,7 +12936,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var version = '0.2';
+	var version = '0.3';
 	exports.default = version;
 
 /***/ },
@@ -16418,7 +16438,7 @@
 
 	// https://d3js.org/d3-interpolate/ Version 0.9.0. Copyright 2016 Mike Bostock.
 	(function (global, factory) {
-	   true ? factory(exports, __webpack_require__(1)) :
+	   true ? factory(exports, __webpack_require__(2)) :
 	  typeof define === 'function' && define.amd ? define(['exports', 'd3-color'], factory) :
 	  (factory((global.d3 = global.d3 || {}),global.d3));
 	}(this, function (exports,d3Color) { 'use strict';
@@ -16961,7 +16981,7 @@
 
 	// https://d3js.org/d3-scale/ Version 0.9.0. Copyright 2016 Mike Bostock.
 	(function (global, factory) {
-	   true ? factory(exports, __webpack_require__(13), __webpack_require__(14), __webpack_require__(16), __webpack_require__(15), __webpack_require__(2), __webpack_require__(18), __webpack_require__(1)) :
+	   true ? factory(exports, __webpack_require__(13), __webpack_require__(14), __webpack_require__(16), __webpack_require__(15), __webpack_require__(3), __webpack_require__(18), __webpack_require__(2)) :
 	  typeof define === 'function' && define.amd ? define(['exports', 'd3-array', 'd3-collection', 'd3-interpolate', 'd3-format', 'd3-time', 'd3-time-format', 'd3-color'], factory) :
 	  (factory((global.d3 = global.d3 || {}),global.d3,global.d3,global.d3,global.d3,global.d3,global.d3,global.d3));
 	}(this, function (exports,d3Array,d3Collection,d3Interpolate,d3Format,d3Time,d3TimeFormat,d3Color) { 'use strict';
@@ -17863,7 +17883,7 @@
 
 	// https://d3js.org/d3-time-format/ Version 0.4.0. Copyright 2016 Mike Bostock.
 	(function (global, factory) {
-	   true ? factory(exports, __webpack_require__(2)) :
+	   true ? factory(exports, __webpack_require__(3)) :
 	  typeof define === 'function' && define.amd ? define(['exports', 'd3-time'], factory) :
 	  (factory((global.d3 = global.d3 || {}),global.d3));
 	}(this, function (exports,d3Time) { 'use strict';
@@ -18454,7 +18474,7 @@
 	(function (root, factory) {
 	  if (true) {
 	    // AMD. Register as an anonymous module with d3 as a dependency.
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(3)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 	  } else if (typeof module === 'object' && module.exports) {
 	    // CommonJS
 	    module.exports = function(d3) {
